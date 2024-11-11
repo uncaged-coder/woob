@@ -492,7 +492,7 @@ class SeleniumBrowser:
     def _setup_driver(self, preferences):
         proxy = self._build_proxy()
         capa = self._build_capabilities()
-        proxy.add_to_capabilities(capa)
+        #proxy.add_to_capabilities(capa)
 
         options = self._build_options(preferences)
         # TODO some browsers don't need headless
@@ -508,9 +508,10 @@ class SeleniumBrowser:
         if self.responses_dirname:
             if not os.path.isdir(self.responses_dirname):
                 os.makedirs(self.responses_dirname)
-            driver_kwargs['service_log_path'] = os.path.join(self.responses_dirname, 'selenium.log')
+            #driver_kwargs['service_log_path'] = os.path.join(self.responses_dirname, 'selenium.log')
         else:
-            driver_kwargs['service_log_path'] = NamedTemporaryFile(prefix='woob_selenium_', suffix='.log', delete=False).name
+            #driver_kwargs['service_log_path'] = NamedTemporaryFile(prefix='woob_selenium_', suffix='.log', delete=False).name
+            pass
 
         if self.remote_driver_url:
             self._setup_remote_driver(options=options, capabilities=capa, proxy=proxy)
@@ -522,12 +523,15 @@ class SeleniumBrowser:
             options.profile = DirFirefoxProfile(self.responses_dirname)
             if self.responses_dirname:
                 capa['profile'] = self.responses_dirname
-            self.driver = self.DRIVER(options=options, capabilities=capa, **driver_kwargs)
+            self.driver = self.DRIVER(options=options, **driver_kwargs)
         elif self.DRIVER is webdriver.Chrome:
             if self.HEADLESS:
                 # Prevent random renderer timeout
                 options.add_argument('--disable-gpu')
-            self.driver = self.DRIVER(options=options, desired_capabilities=capa, **driver_kwargs)
+                options.add_argument('--ozone-platform=wayland')
+                options.add_argument('--disable-widevine')
+                #options.add_argument('--headless')
+            self.driver = self.DRIVER(options=options, **driver_kwargs)
         else:
             raise NotImplementedError()
 
